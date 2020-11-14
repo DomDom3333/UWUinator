@@ -143,7 +143,7 @@ function wuvUser(message, more = false)
     if(more === true){
         returnMsg = returnMsg.concat(`\nI'ww do the west of da msg now! xoxo`)
     }
-    logInput(message, output);
+    logInput(message, returnMsg);
     message.channel.send(returnMsg);
 }
 
