@@ -47,7 +47,7 @@ function Trigger(message){
 
 function UwU(message, input)
 {
-    input = input.concat("Didn't you mean: \n" + message.content);
+    input = input.concat("Didn't you mean: \n>>> " + message.content);
     input = input.replace(/r/g,'w');
     input = input.replace(/R/g,'W');
     input = input.replace(/l/g,'w');
