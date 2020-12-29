@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const CONFIG = require('./config.json');
 const bot = new Discord.Client();
+const botRole = '776942635595857955';
 
 
 bot.login(CONFIG.Token);
@@ -21,7 +22,7 @@ bot.on('message', message =>{
     try{
         if (!checkWhetherToRespond(message)) return;
         var messageCheck = message.content.toLowerCase();
-        if(altTriggers(message,messageCheck)) return;;
+        if(altTriggers(message,messageCheck)) return;
         if (willTrigger(message,messageCheck))
         { 
             message.channel.startTyping();
@@ -68,6 +69,11 @@ function willTrigger(message,messageCheck)
     {
         return false;
     }
+}
+
+function isAllowedToSend(message){
+    var memberPerms = message.channel.permissionsFor(message.guild.me);
+    return memberPerms.has('SEND_MESSAGES')
 }
 
 function altTriggers(message,checkThis){
@@ -168,11 +174,12 @@ function logInput(message, output)
 
 function checkWhetherToRespond(message)
 {
+    if (!isAllowedToSend(message)) return false; //doesnt respond if not allowed to send
     if (message.content.includes(bot.id)) return true;
     if (!message.content.includes(PREFIX)) return false;
     if (message.author.bot) return false; //ignores itself and other bots
     if (message.content.length<=1) return false;//check for length of message
     if (message.content.includes('https://')) return false;
-    if (message.content.includes('www.')) return false;
+    if (message.content.includes('www.')) return false;   
     return true;
 }
