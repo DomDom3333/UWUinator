@@ -132,10 +132,5 @@ function wuvUser(message, more = false)
 
 function logInput(message, output)
 {
-    var userName = message.author.tag;
-    var serverName = message.guild.name;
-    var inputMessage = message.content;
-    var recievedChannel = message.channel.name;
-
-    LOG.info(`\nNew message from: @${userName}\nMessage sent from Server: '${serverName}'\nSent in channel: '${recievedChannel}'\nInput: ${inputMessage}\n`);
+    LOG.info(`I UwUd something!\n- Server: ${message.guild.name}\n- User: ${message.author.username}\n- Content: ${message.content}`);
 }

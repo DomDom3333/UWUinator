@@ -19,8 +19,11 @@ bot.once('ready', () => {
 });
 
 bot.on('message', async message => {   
+
     try{
-        if(UTILS.shouldRespond(message)){                       
+        if(UTILS.shouldRespond(message)){           
+            UTILS.rateLimiter(message);
+            
             await MESSAGECENTER.messageHandler(message,PREFIX);
             
             var msg = COLLECTOR.Return();
@@ -36,6 +39,7 @@ bot.on('message', async message => {
     catch(e){
         console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SOMETHING WENT WRONG!!!!!!!!!!!!!!!!!!!')
         LOG.error(message.content, e);
+        UTILS.contactAdmins(`Something went wrong with me!\n${message.content}\n${e}`);
         console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SOMETHING WENT WRONG!!!!!!!!!!!!!!!!!!!')
     }
 });
@@ -51,12 +55,6 @@ bot.on('error', async error =>{
     if (LogPromise.length > 1500) {
         LogPromise = LogPromise.substring(0,1500);
     }
-    CONFIG.Admins.forEach(admin => {
-        try{
-            IMPORTEDBOT.bot.users.cache.get(admin).send(`A fatal error occoured!. Bot will no longer be opertational!\nSending last Log entries:\n${LogPromise}\n${error}`);
-        }
-        catch(err){
-            LOG.error(`Failed to contact ${admin}`,err);
-        }       
-    });
+    UTILS.contactAdmins(`A fatal error occoured!. Bot will no longer be opertational!\nSending last Log entries:\n${LogPromise}\n${error}`);
+
 });

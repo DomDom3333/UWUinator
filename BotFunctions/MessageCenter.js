@@ -56,14 +56,14 @@ function messagePrep(message){
 }
 
 function RunUserFunctions(message,args){
-    LOG.info(`New command!\n- User: ${message.author.username} \n- Server: ${message.guild.name}\n- Command: ${message.content}`);
+    LOG.info(`New message!\n- User: ${message.author.username} \n- Server: ${message.guild.name} (${message.guild.id})\n- Command: ${message.content}`);
 
     try {
         return BOT.commands.get(args[0]).execute(message,args);//attempt to run a given command. if it exists
     }
     catch(err) {//failover if a command doesnt exist or an error occours
         COLLECTOR.Clear();
-        LOG.error(' ',err);
+        LOG.error('',err);
         COLLECTOR.Add("Something went wrong while processing your command. You should not be seeing this message. If you want to help solve the issiue, take a screenshot of your interaction with the BOT and contact an Admin.");
     }
 }
@@ -78,6 +78,7 @@ function RunAdminFunctions(message,args){
     }
     catch(err) {//failover if a command doesnt exist or an error occours
         COLLECTOR.Clear();
+        LOG.error('',err);
         COLLECTOR.Add("Something went wrong while processing your command. You should not be seeing this message. If you want to help solve the issiue, take a screenshot of your interaction with the BOT and contact an Admin.");
     }
 }
