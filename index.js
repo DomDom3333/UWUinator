@@ -15,14 +15,15 @@ PREFIX = CONFIG.Prefix;
 bot.once('ready', () => {
     this.bot = bot
     bot.user.setActivity(CONFIG.ReadyMessage)
-    LOG.info("BeeP BooP Bot Online Now")//successful startup log
+    LOG.info("We UwU-ing Now!!")//successful startup log
 });
 
 bot.on('message', async message => {   
-
     try{
         if(UTILS.shouldRespond(message)){           
-            UTILS.rateLimiter(message);
+            if (!UTILS.rateLimiter(message)){
+                return;
+            }
             
             await MESSAGECENTER.messageHandler(message,PREFIX);
             
@@ -55,6 +56,5 @@ bot.on('error', async error =>{
     if (LogPromise.length > 1500) {
         LogPromise = LogPromise.substring(0,1500);
     }
-    UTILS.contactAdmins(`A fatal error occoured!. Bot will no longer be opertational!\nSending last Log entries:\n${LogPromise}\n${error}`);
-
+   UTILS.contactAdmins(`A fatal error occoured!. Bot will no longer be opertational!\nSending last Log entries:\n${LogPromise}\n${error}`);
 });

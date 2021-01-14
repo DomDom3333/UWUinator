@@ -42,7 +42,7 @@ module.exports = {
             return RunUserFunctions(message,args);
         }
         else{
-            return BOT.commands.get("uwu").execute(message,args);
+            return BOT.commands.get("PassiveCommand").execute(message,args);
         }
     }
 }

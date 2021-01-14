@@ -6,7 +6,7 @@ const COLLECTOR = require('../../BotFunctions/MessageCollector.js');
 
 
 module.exports = {
-    name: 'uwu',
+    name: 'PassiveCommand',
     description: "This is the UWU Command",
     enabled: true, //if false, command will be disabled
     execute(message,args){
@@ -45,8 +45,9 @@ function UwU(message, input)
 }
 function willTrigger(message,messageCheck)
 {
-    var random_boolean = Math.random() <= CONFIG.triggerChance;
+    if ((message.content.split(' ').length -1) < 2) return false;
     if (!messageCheck.includes('r') || !messageCheck.includes('r')) return false;
+    var random_boolean = Math.random() <= CONFIG.triggerChance;
     if (message.content.includes(CONFIG.Prefix) && random_boolean == true && (messageCheck.length > CONFIG.lengthThreshhold || ((hasEnoughR(messageCheck) > CONFIG.rThreshhold || hasEnoughL(messageCheck) > CONFIG.lThreshhold))))
     {
         return true;
@@ -79,7 +80,7 @@ function altTriggers(message,checkThis){
     }
     else if(checkThis.includes(`<@!${message.guild.me.id}>`))
     {
-        wuvUser(message);
+        //wuvUser(message);
         Trigger(message);      
         return true;
     }
@@ -130,7 +131,12 @@ function wuvUser(message, more = false)
     COLLECTOR.Add(returnMsg);
 }
 
-function logInput(message, output)
+function logInput(message, output, tag)
 {
-    LOG.info(`I UwUd something!\n- Server: ${message.guild.name}\n- User: ${message.author.username}\n- Content: ${message.content}`);
+    if (tag) {
+        LOG.info(`I got Tagged O_O!\n- Server: ${message.guild.name}\n- User: ${message.author.username}\n- Content: ${message.content}`);
+    }
+    else{
+        LOG.info(`I UwUd something!\n- Server: ${message.guild.name}\n- User: ${message.author.username}\n- Content: ${message.content}`);
+    }
 }

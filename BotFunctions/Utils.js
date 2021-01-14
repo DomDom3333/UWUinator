@@ -50,18 +50,17 @@ class warned {
     }
 }
 
-const ALPHABET = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+const ALPHABET = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', PREFIX]
 module.exports = {
     shouldRespond(message){
-        if (message.author.id == message.guild.me.id) return false;
-        if (!isAllowedToSend(message)) return false; //doesnt respond if not allowed to send
+        if (message.author.bot) return false;
+        if (message.guild === null) return false; //is a DM?
+        if (!message.content) return false; //Has text? (could be only image)
+        if (!isAllowedToSend(message)) return false; //doesnt respond if not allowed to send to channel. Otherwise discord.js errors
         if (message.channel.nsfw) return false;
-        if (message.content.includes(`<@!${message.guild.me.id}>`)) return true;
-        if ((message.content.split(' ').length -1) < 2) return false;
+        if (message.content.includes(`<@!${message.guild.me.id}>`)) return true; //was tagged
         if (!ALPHABET.includes(message.content[0].toUpperCase())) return false;
         if (!message.content[0] === PREFIX) return false;
-        if (message.author.bot) return false;
-        if (message.content.length <= 1) return false;
         if (message.content.includes('https://')) return false;
         if (message.content.includes('www.')) return false;
         return true;
@@ -74,10 +73,11 @@ module.exports = {
 
         if(Date.now()-unBanTimer > 1200000){
             bannedChannels.shift();
+            unBanTimer = Date.now();
         }
 
         if(bannedChannels.includes(message.channel.id)){
-            return;
+            return false;
         }
         var timeEllapsed = Date.now() - lastMessageTime;
     
@@ -88,6 +88,10 @@ module.exports = {
                     element.addCount();
                     LOG.info(`Channel ${message.channel.name} has been warned ${element.count} times.`)
                     channelHasWarnings = true;
+                    if(element.shouldBeBanned == true){
+                        bannedChannels.push(message.channel.id);
+                        LOG.info(`Added Channel ${message.channel.name} to banned channels`);
+                    }
                 }
             });
             if (!channelHasWarnings) {            
@@ -95,15 +99,10 @@ module.exports = {
                 warnedList.push(warnedChannel);
                 LOG.info(`Channel ${message.channel.name} has been warned for the first time.`)
             }
-            warnedList.forEach(element => {
-                if(element.shouldBeBanned == true){
-                    bannedChannels.push(message.channel.id);
-                    LOG.info(`Added Channel ${message.channel.name} to banned channels`);
-                }
-            });
         }
         lastMessageChannel = message.channel.id;
         lastMessageTime = Date.now();
+        return true;
     },
 
     contactAdmins(message){

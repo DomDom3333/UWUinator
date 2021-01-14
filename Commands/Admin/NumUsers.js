@@ -11,8 +11,11 @@ module.exports = {
     enabled: true, //if false, command will not work
     execute(message,args){
         if(this.enabled && allowedAdmins.includes(message.author.id)){
-            COLLECTOR.Add(`Serving ${IMPORTEDBOT.bot.users.cache.size} Users!`);
-        }
+            var numUsers = 0;
+            IMPORTEDBOT.bot.guilds.cache.forEach(element => {
+                numUsers = numUsers + element.memberCount;
+            });
+            COLLECTOR.Add(`Serving ${numUsers} Users!`);        }
         else{
             Collector.Add("This command is currently DISABLED");
         }
