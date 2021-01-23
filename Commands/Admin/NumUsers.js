@@ -9,7 +9,7 @@ module.exports = {
     name: 'numusers',
     description: 'Shuts down the Bot.',
     enabled: true, //if false, command will not work
-    async execute(message,args){
+    execute(message,args){
         if(this.enabled && allowedAdmins.includes(message.author.id)){
             var numUsers = 0;
             IMPORTEDBOT.bot.guilds.cache.forEach(element => {

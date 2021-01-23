@@ -31,6 +31,15 @@ for(const filename of AdminCommandFiles){
     AdminCommandList.push(command.name);
 }
 
+var PassiveCommandList = [];
+const PassiveCommandFiles = fs.readdirSync(`./Commands/Passive`).filter(file => file.endsWith('.js'));
+
+for(const filename of PassiveCommandFiles){
+    const command = require (`../Commands/Passive/${filename}`); 
+    BOT.commands.set(command.name,command);
+    PassiveCommandList.push(command.name);
+}
+
 module.exports = {
     messageHandler(message) {//First split for messages
 
@@ -42,8 +51,16 @@ module.exports = {
             return RunUserFunctions(message,args);
         }
         else{
-            return BOT.commands.get("PassiveCommand").execute(message,args);
-        }
+            if (PassiveCommandList.length > 1){
+                var chosenCommand = Math.floor(Math.random() * PassiveCommandList.length);
+                return BOT.commands.get(PassiveCommandList[chosenCommand]).execute(message,args);//attempt to run a given command. if it exists
+            }
+            else if(PassiveCommandList.length = 1){
+                return BOT.commands.get(PassiveCommandList[0]).execute(message,args);//attempt to run a given command. if it exists
+            }
+            else{
+                return;
+            }        }
     }
 }
 

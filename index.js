@@ -48,12 +48,12 @@ bot.on('message', async message => {
 
 bot.on('guildCreate', guild => {
     LOG.info(`NEW SERVER JOINED!!!!!!!!\n- Name: ${guild.name}\n- Member Count: ${guild.memberCount}\nI'm now in ${bot.guilds.cache.size} Servers!`);
-    Utils.contactAdmins(`NEW SERVER JOINED!!!!!!!!\n- Name: ${guild.name}\n- Member Count: ${guild.memberCount}I'm now in ${bot.guilds.cache.size} Servers!`);
+    Utils.contactAdmins(`NEW SERVER JOINED!!!!!!!!\n- Name: ${guild.name}\n- Member Count: ${guild.memberCount}\nI'm now in ${bot.guilds.cache.size} Servers!`);
 });
 
 bot.on("guildDelete", guild => {
-    LOG.info(`Got booted from a Server!!!!!!!!\n- Name: ${guild.name}\n- Member Count: ${guild.memberCount}I'm now in ${bot.guilds.cache.size} Servers!`);
-    Utils.contactAdmins(`Got booted from a Server!!!!!!!!\n- Name: ${guild.name}\n- Member Count: ${guild.memberCount}I'm now in ${bot.guilds.cache.size} Servers!`);
+    LOG.info(`Got booted from a Server!!!!!!!!\n- Name: ${guild.name}\n- Member Count: ${guild.memberCount}\nI'm now in ${bot.guilds.cache.size} Servers!`);
+    Utils.contactAdmins(`Got booted from a Server!!!!!!!!\n- Name: ${guild.name}\n- Member Count: ${guild.memberCount}\nI'm now in ${bot.guilds.cache.size} Servers!`);
 })
 
 bot.on('error', async error =>{

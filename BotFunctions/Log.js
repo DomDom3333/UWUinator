@@ -25,7 +25,7 @@ module.exports = {
 
     info(infoMessage){
         UpdateTimes();
-        var logText = `--------------------------------------------------------------------------------------------------------------\n${now} - ${infoMessage}\n--------------------------------------------------------------------------------------------------------------\n`;
+        var logText = `\n${now} - ${infoMessage}\n--------------------------------------------------------------------------------------------------------------\n`;
 
         writeToConsole(logText);
         writeToFile(logText);
@@ -58,7 +58,7 @@ function writeToConsole(TextToWrite){
     console.log(TextToWrite);
 }
 
-function readLog(numOfLines = 20){
+function readLog(numOfLines = 35){
     var LogPromise = '';
     try{
         numOfLines = parseInt(numOfLines,10)
