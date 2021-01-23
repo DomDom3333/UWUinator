@@ -28,7 +28,7 @@ module.exports = {
 function Trigger(message){
     var input = `Hello there! I'm UwU-bot! I saw your cool message over there and it didn't seem right. Let me help you out and fix that for you!\n`;
     input = (UwU(message, input));
-    logInput(message, input,false);
+    logInput(message, input);
     COLLECTOR.Add(input);
 }
 
@@ -67,14 +67,14 @@ function altTriggers(message,checkThis){
     else if(checkThis === `<@!${message.guild.me.id}> sing`)
     {
         var outputMsg = `Suwe thing!! \nhttps://www.youtube.com/watch?v=h6DNdop6pD8\nENJOY! UwU`
-        logInput(message, outputMsg, true);
+        logInput(message, outputMsg);
         COLLECTOR.Add(outputMsg);
         return true;
     }
-    else if(checkThis === `<@!${message.guild.me.id}> info` || checkThis === `<@!${message.guild.me.id}> help`)
+    else if(checkThis === `<@!${message.guild.me.id}> info`)
     {
-        var outputMsg = `YAY!! Hewe you can find some info! Awso pwease Vote fow me!! \nhttps://top.gg/bot/776864557775585296\nENJOY! UwU`
-        logInput(message, outputMsg, true);
+        var outputMsg = `YAY!! Pwease Vote fow me!! \nhttps://top.gg/bot/776864557775585296\nENJOY! UwU`
+        logInput(message, outputMsg);
         COLLECTOR.Add(outputMsg);
         return true;
     }
@@ -127,7 +127,7 @@ function wuvUser(message, more = false)
     if(more === true){
         returnMsg = returnMsg.concat(`\nI'ww do the west of da msg now! xoxo`)
     }
-    logInput(message, returnMsg, false);
+    logInput(message, returnMsg);
     COLLECTOR.Add(returnMsg);
 }
 

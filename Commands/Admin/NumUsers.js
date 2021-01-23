@@ -9,13 +9,15 @@ module.exports = {
     name: 'numusers',
     description: 'Shuts down the Bot.',
     enabled: true, //if false, command will not work
-    execute(message,args){
+    async execute(message,args){
         if(this.enabled && allowedAdmins.includes(message.author.id)){
             var numUsers = 0;
             IMPORTEDBOT.bot.guilds.cache.forEach(element => {
-                numUsers = numUsers + element.memberCount;
+                if (!isNaN(element.memberCount)) {
+                    numUsers = numUsers + element.memberCount; //Can be expanded to differentiate between bots and humans once verified! https://stackoverflow.com/questions/64559390/none-of-my-discord-js-guildmember-events-are-emitting-my-user-caches-are-basica
+                }
             });
-            COLLECTOR.Add(`Serving ${numUsers} Users!`);        }
+            COLLECTOR.Add(`Serving ${numUsers} Humans!`);        }
         else{
             Collector.Add("This command is currently DISABLED");
         }

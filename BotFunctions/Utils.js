@@ -67,16 +67,21 @@ module.exports = {
     },
 
     rateLimiter(message){
-        warnedList.forEach(element => {
-            element.updateWarnings()
-        });
-
+        var pass = true;
+        
         if(Date.now()-unBanTimer > 1200000){
             bannedChannels.shift();
             unBanTimer = Date.now();
         }
 
-        if(bannedChannels.includes(message.channel.id)){
+        warnedList.forEach(element => {
+            element.updateWarnings();
+            if (element.channelName == message.channel.id && element.shouldBeBanned == true) {
+                pass = false;
+            }
+        });
+
+        if(bannedChannels.includes(message.channel.id || !pass)){
             return false;
         }
         var timeEllapsed = Date.now() - lastMessageTime;
@@ -86,18 +91,19 @@ module.exports = {
             warnedList.forEach(element => {
                 if (element.channelName == message.channel.id) {
                     element.addCount();
-                    LOG.info(`Channel ${message.channel.name} has been warned ${element.count} times.`)
+                    //LOG.info(`Channel ${message.channel.name} has been warned ${element.count} times.`)
                     channelHasWarnings = true;
                     if(element.shouldBeBanned == true){
                         bannedChannels.push(message.channel.id);
                         LOG.info(`Added Channel ${message.channel.name} to banned channels`);
+                        return false;
                     }
                 }
             });
             if (!channelHasWarnings) {            
                 var warnedChannel = new warned(message.channel.id,Date.now());
                 warnedList.push(warnedChannel);
-                LOG.info(`Channel ${message.channel.name} has been warned for the first time.`)
+                //LOG.info(`Channel ${message.channel.name} has been warned for the first time.`)
             }
         }
         lastMessageChannel = message.channel.id;
