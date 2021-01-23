@@ -4,7 +4,6 @@ const UTILS = require('./BotFunctions/Utils.js');
 const LOG = require('./BotFunctions/Log.js');
 const COLLECTOR = require('./BotFunctions/MessageCollector.js');
 const MESSAGECENTER = require('./BotFunctions/MessageCenter.js');
-const Utils = require('./BotFunctions/Utils.js');
 const bot = new Discord.Client();
 const botRole = '776942635595857955';
 
@@ -47,14 +46,8 @@ bot.on('message', async message => {
 });
 
 bot.on('guildCreate', guild => {
-    LOG.info(`NEW SERVER JOINED!!!!!!!!\n- Name: ${guild.name}\n- Member Count: ${guild.memberCount}\nI'm now in ${bot.guilds.cache.size} Servers!`);
-    Utils.contactAdmins(`NEW SERVER JOINED!!!!!!!!\n- Name: ${guild.name}\n- Member Count: ${guild.memberCount}I'm now in ${bot.guilds.cache.size} Servers!`);
+    LOG.info(`NEW GUILD JOINED!!!!!!!!\n- Name: ${guild.name}\n- Member Count: ${guild.memberCount}`);
 });
-
-bot.on("guildDelete", guild => {
-    LOG.info(`Got booted from a Server!!!!!!!!\n- Name: ${guild.name}\n- Member Count: ${guild.memberCount}I'm now in ${bot.guilds.cache.size} Servers!`);
-    Utils.contactAdmins(`Got booted from a Server!!!!!!!!\n- Name: ${guild.name}\n- Member Count: ${guild.memberCount}I'm now in ${bot.guilds.cache.size} Servers!`);
-})
 
 bot.on('error', async error =>{
     LOG.error('A fatal error occoured!. Bot will no longer be opertational!',error);
