@@ -12,12 +12,18 @@ module.exports = {
     execute(message,args){
         if(this.enabled && allowedAdmins.includes(message.author.id)){
             var numUsers = 0;
+            var biggestServerCount = 0;
+            var biggestServerName = '';
             IMPORTEDBOT.bot.guilds.cache.forEach(element => {
                 if (!isNaN(element.memberCount)) {
                     numUsers = numUsers + element.memberCount; //Can be expanded to differentiate between bots and humans once verified! https://stackoverflow.com/questions/64559390/none-of-my-discord-js-guildmember-events-are-emitting-my-user-caches-are-basica
+                    if (element.memberCount) {
+                        biggestServerCount = element.memberCount;
+                        biggestServerName = element.name;
+                    }
                 }
             });
-            COLLECTOR.Add(`Serving ${numUsers} Humans!`);        }
+            COLLECTOR.Add(`Serving ${numUsers} Humans!\nThe largest Server is ${biggestServerName} with ${biggestServerCount} Members.`);        }
         else{
             Collector.Add("This command is currently DISABLED");
         }

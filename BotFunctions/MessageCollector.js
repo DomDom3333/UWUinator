@@ -3,12 +3,20 @@
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 var messageSoFar = '';
-
+var attach = false;
+var attachPath = '';
+var attachName = '';
+var Prom = [];
 
 module.exports = {
 
     Add(textToAdd){
         messageAdder(textToAdd);
+    },
+    async AddFile(path,fileName){
+        attach = true;
+        attachPath = await path;
+        attachName = await fileName;
     },
     Return(){
         if(messageSoFar.length > 1960){
@@ -18,6 +26,20 @@ module.exports = {
     },
     Clear(){
         messageSoFar = '';
+        attach = false;
+
+    },
+    hasAttach(){
+        return attach;
+    },
+    ReturnAttachData(){
+        return [attachPath,attachName];
+    },
+    setWait(promise){
+        Prom.push(promise);
+    },
+    isWaiting(){
+        return Prom;
     }
 }
 

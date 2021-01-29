@@ -52,8 +52,11 @@ module.exports = {
         }
         else{
             if (PassiveCommandList.length > 1){
-                var chosenCommand = Math.floor(Math.random() * PassiveCommandList.length);
-                return BOT.commands.get(PassiveCommandList[chosenCommand]).execute(message,args);//attempt to run a given command. if it exists
+                var promises = []
+                PassiveCommandList.forEach(element => {
+                    promises.push(BOT.commands.get(element).execute(message,args));
+                });
+                return Promise.all(promises);
             }
             else if(PassiveCommandList.length = 1){
                 return BOT.commands.get(PassiveCommandList[0]).execute(message,args);//attempt to run a given command. if it exists

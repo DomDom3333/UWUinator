@@ -16,7 +16,7 @@ PREFIX = CONFIG.Prefix;
 bot.once('ready', () => {
     this.bot = bot
     bot.user.setActivity(CONFIG.ReadyMessage)
-    LOG.info("We UwU-ing Now!!")//successful startup log
+    LOG.info("\nWe UwU-ing Now!!")//successful startup log
 });
 
 bot.on('message', async message => {   
@@ -30,8 +30,24 @@ bot.on('message', async message => {
             
             var msg = COLLECTOR.Return();
             
-            if (msg != ''){
+            await Promise.all(COLLECTOR.isWaiting());
+            if (COLLECTOR.hasAttach()) {
                 message.channel.startTyping();
+                var attaches = COLLECTOR.ReturnAttachData();
+                if (fs.existsSync(attaches[0])) {
+                    message.channel.send(msg,{
+                        files: [{
+                            attachment: attaches[0],
+                            name: attaches[1]
+                            }]
+                    });
+                    COLLECTOR.Clear();                      
+                }
+                else{
+                    LOG.error(`Failed to find resulting image at ${attaches[0]}.`)
+                }
+            }
+            else if (msg != ''){
                 message.channel.send(msg);
                 COLLECTOR.Clear();
             }
