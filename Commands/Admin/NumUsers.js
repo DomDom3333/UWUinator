@@ -17,7 +17,7 @@ module.exports = {
             IMPORTEDBOT.bot.guilds.cache.forEach(element => {
                 if (!isNaN(element.memberCount)) {
                     numUsers = numUsers + element.memberCount; //Can be expanded to differentiate between bots and humans once verified! https://stackoverflow.com/questions/64559390/none-of-my-discord-js-guildmember-events-are-emitting-my-user-caches-are-basica
-                    if (element.memberCount) {
+                    if (element.memberCount > biggestServerCount) {
                         biggestServerCount = element.memberCount;
                         biggestServerName = element.name;
                     }

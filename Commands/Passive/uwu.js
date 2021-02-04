@@ -71,9 +71,9 @@ function altTriggers(message,checkThis){
         COLLECTOR.Add(outputMsg);
         return true;
     }
-    else if(checkThis === `<@!${message.guild.me.id}> info`)
+    else if(checkThis === `<@!${message.guild.me.id}> info` || checkThis === `<@!${message.guild.me.id}> help`)
     {
-        var outputMsg = `YAY!! Pwease Vote fow me!! \nhttps://top.gg/bot/776864557775585296\nENJOY! UwU`
+        var outputMsg = `YAY!! Pwease Vote fow me!! \nhttps://top.gg/bot/776864557775585296\nHere is my Discord server too: https://discord.gg/9g9xMkKY2N\nENJOY! UwU`
         logInput(message, outputMsg);
         COLLECTOR.Add(outputMsg);
         return true;

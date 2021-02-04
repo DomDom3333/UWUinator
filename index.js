@@ -65,6 +65,9 @@ bot.on('message', async message => {
 bot.on('guildCreate', guild => {
     LOG.info(`NEW SERVER JOINED!!!!!!!!\n- Name: ${guild.name}\n- Member Count: ${guild.memberCount}\nI'm now in ${bot.guilds.cache.size} Servers!`);
     Utils.contactAdmins(`NEW SERVER JOINED!!!!!!!!\n- Name: ${guild.name}\n- Member Count: ${guild.memberCount}\nI'm now in ${bot.guilds.cache.size} Servers!`);
+
+    var channel = guild.channels.cache.find(channel => channel.type === 'text' && channel.permissionsFor(guild.me).has('SEND_MESSAGES'))
+    channel.send("__***Thanks for invite me!***__\nFind out how to use me as well as my Discord server here: \n**https://top.gg/bot/776864557775585296**\nAlternatively you can use @UwUinator help")
 });
 
 bot.on("guildDelete", guild => {

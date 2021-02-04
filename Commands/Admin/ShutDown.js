@@ -13,6 +13,9 @@ module.exports = {
     enabled: true, //if false, command will not work
     execute(message,args){
         if(this.enabled && allowedAdmins.includes(message.author.id)){
+            if (args.length < 2 || !args[1].includes(message.guild.me.id)) {
+                return;
+            }
             if(Date.now() - lastSDRequestTime > 10000){
                 shutdownRequests = 0;
             }

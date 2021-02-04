@@ -25,7 +25,7 @@ module.exports = {
 
     info(infoMessage){
         UpdateTimes();
-        var logText = `${now} - ${infoMessage}\n--------------------------------------------------------------------------------------------------------------\n`;
+        var logText = `${now} - ${infoMessage}\n--------------------------------------------------------------------------------------------------------------`;
 
         writeToConsole(logText);
         writeToFile(logText);
