@@ -60,7 +60,6 @@ module.exports = {
         if (message.channel.nsfw) return false;
         if (message.content.includes(`<@!${message.guild.me.id}>`)) return true; //was tagged
         if (!ALPHABET.includes(message.content[0].toUpperCase())) return false;
-        if (!message.content[0] === PREFIX) return false;
         if (message.content.includes('https://')) return false;
         if (message.content.includes('www.')) return false;
         return true;

@@ -42,13 +42,16 @@ for(const filename of PassiveCommandFiles){
 
 module.exports = {
     messageHandler(message) {//First split for messages
-
-        var args = messagePrep(message);
-        if(AdminCommandList.includes(args[0])){
-            return RunAdminFunctions(message,args);
+        var hasPrefix = false;
+        if (message.content[0] === CONFIG.Prefix) {
+            hasPrefix = true;
         }
-        else if(UserCommandList.includes(args[0])){
+        var args = messagePrep(message,hasPrefix);
+        if(UserCommandList.includes(args[0]) && hasPrefix){
             return RunUserFunctions(message,args);
+        }
+        else if (AdminCommandList.includes(args[0]) && hasPrefix){
+            return RunAdminFunctions(message,args)
         }
         else{
             if (PassiveCommandList.length > 1){
@@ -63,7 +66,8 @@ module.exports = {
             }
             else{
                 return;
-            }        }
+            }
+        }
     }
 }
 
