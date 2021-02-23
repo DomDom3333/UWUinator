@@ -1,8 +1,8 @@
 const CONFIG = require('../config.json');
 const LOG = require('./Log.js');
 const IMPORTEDBOT = require('../index.js');
-const PREFIX = CONFIG.Prefix
-
+const PREFIX = CONFIG.Prefix;
+const fs = require('fs');
 
 var lastMessageChannel = '';
 var lastMessageTime = '';
@@ -119,6 +119,22 @@ module.exports = {
                 LOG.error(`Failed to contact ${admin}`,err);
             }       
         });
+    },
+
+    saveJsonFile(inputData, Path, logSave){
+        let dataString = JSON.stringify(inputData, null, 2);
+        try {
+            fs.writeFile(Path, dataString, (err) => {
+                if (err) throw err;
+                if (logSave) {
+                    console.log('Data written to file');
+                }
+            });
+            
+        } 
+        catch (error) {
+            LOG.error(error, `Failed to write to file ${Path}`);
+        }
     }
 }
 

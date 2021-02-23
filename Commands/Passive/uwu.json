@@ -1,0 +1,19 @@
+{
+  "Servers": [
+    {
+      "ServerID": 0,
+      "TriggerChance": 0.35,
+      "BoundUsers": [
+        "123456789"
+      ]
+    },
+    {
+      "ServerID": 724992148444938400,
+      "TriggerChance": 0.5,
+      "BoundUsers": [
+        "796353715673104415",
+        "110596839018856448"
+      ]
+    }
+  ]
+}
