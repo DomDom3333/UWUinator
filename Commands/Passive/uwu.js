@@ -71,33 +71,39 @@ function altTriggers(message,checkThis,args){
     else if (checkThis.startsWith(`<@!${message.guild.me.id}>`) && args.length > 1 && (args[1] == "chance" || args[1] == "bind" || args[1] == "unbind")){
         switch (args[1]) {
             case 'chance':
-                if (args.length > 2 && message.author.hasPermission("ADMINISTRATOR")) {
+                if (args.length > 2 && message.member.hasPermission("ADMINISTRATOR")) {
                     var newChance = Number(args[2]);
                     ChangeTriggerChance(newChance,message.guild.id);
                     COLLECTOR.Add("Twiggew chance updated");
+                    return true;
                 } 
                 else {
-                    COLLECTOR.Add("No new Chance specified.")
+                    COLLECTOR.Add("No new Chance specified.");
+                    return true;
                 }
                 break;
             case 'bind':
-                if (message.mentions.members.size > 1  && message.author.hasPermission("ADMINISTRATOR")) {
+                if (message.mentions.members.size > 1  &&  message.member.hasPermission("ADMINISTRATOR")) {
                     var newBind = message.mentions.users.array()[1].id;
                     AddBoundUser(newBind,message.guild.id);
                     COLLECTOR.Add("Usew added to Bound usews");
+                    return true;
                 }
                 else{
-                    COLLECTOR.Add("No user mentioned!")
+                    COLLECTOR.Add("No user mentioned!");
+                    return true;
                 }
                 break;
             case 'unbind':
-                if (message.mentions.members.size > 1  && message.author.hasPermission("ADMINISTRATOR")) {
+                if (message.mentions.members.size > 1  && message.member.hasPermission("ADMINISTRATOR")) {
                     var newUnbind = message.mentions.users.array()[1].id;
                     RemoveBoundUser(newUnbind,message.guild.id);
                     COLLECTOR.Add("Usew wemoved fwom bound usews");
+                    return true;
                 }
                 else{
-                    COLLECTOR.Add("No usew mentioned!")
+                    COLLECTOR.Add("No usew mentioned!");
+                    return true;
                 }
                 break;
             default:

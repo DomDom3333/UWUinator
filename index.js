@@ -9,7 +9,7 @@ const bot = new Discord.Client();
 const botRole = '776942635595857955';
 
 
-bot.login(CONFIG.Token);
+bot.login(CONFIG.Token2);
 PREFIX = CONFIG.Prefix;
 
 
