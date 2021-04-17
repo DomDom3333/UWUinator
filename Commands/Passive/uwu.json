@@ -1,19 +1,61 @@
 {
   "Servers": [
     {
-      "ServerID": 0,
-      "TriggerChance": 0.35,
+      "ServerID": "716450074439188574",
+      "TriggerChance": 0,
       "BoundUsers": [
-        "123456789"
+        "212655289684459520"
       ]
     },
     {
-      "ServerID": 724992148444938400,
-      "TriggerChance": 0.5,
-      "BoundUsers": [
-        "796353715673104415",
-        "110596839018856448"
-      ]
+      "ServerID": "806748122004193290",
+      "TriggerChance": 0.35,
+      "BoundUsers": []
+    },
+    {
+      "ServerID": "807020265695084564",
+      "TriggerChance": 0.35,
+      "BoundUsers": []
+    },
+    {
+      "ServerID": "353948643461562368",
+      "TriggerChance": 0.35,
+      "BoundUsers": []
+    },
+    {
+      "ServerID": "661780393086812161",
+      "TriggerChance": 0.35,
+      "BoundUsers": []
+    },
+    {
+      "ServerID": "541361336446222347",
+      "TriggerChance": 0.35,
+      "BoundUsers": []
+    },
+    {
+      "ServerID": "806809759243960320",
+      "TriggerChance": 0.35,
+      "BoundUsers": []
+    },
+    {
+      "ServerID": "724992148444938330",
+      "TriggerChance": 0.35,
+      "BoundUsers": []
+    },
+    {
+      "ServerID": "792847205756960789",
+      "TriggerChance": 0.35,
+      "BoundUsers": []
+    },
+    {
+      "ServerID": "743944471934140467",
+      "TriggerChance": 0.35,
+      "BoundUsers": []
+    },
+    {
+      "ServerID": "799437500091072572",
+      "TriggerChance": 0.35,
+      "BoundUsers": []
     }
   ]
 }

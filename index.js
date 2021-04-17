@@ -9,7 +9,7 @@ const bot = new Discord.Client();
 const botRole = '776942635595857955';
 
 
-bot.login(CONFIG.Token2);
+bot.login(CONFIG.Token);
 PREFIX = CONFIG.Prefix;
 
 
@@ -71,6 +71,9 @@ bot.on('guildCreate', guild => {
 });
 
 bot.on("guildDelete", guild => {
+    if (guild.name === undefined ) {
+        return;
+    }
     LOG.info(`Got booted from a Server!!!!!!!!\n- Name: ${guild.name}\n- Member Count: ${guild.memberCount}\nI'm now in ${bot.guilds.cache.size} Servers!`);
     Utils.contactAdmins(`Got booted from a Server!!!!!!!!\n- Name: ${guild.name}\n- Member Count: ${guild.memberCount}\nI'm now in ${bot.guilds.cache.size} Servers!`);
 })

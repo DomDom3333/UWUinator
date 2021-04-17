@@ -58,7 +58,12 @@ module.exports = {
         if (!message.content) return false; //Has text? (could be only image)
         if (!isAllowedToSend(message)) return false; //doesnt respond if not allowed to send to channel. Otherwise discord.js errors
         if (message.channel.nsfw) return false;
-        if (message.content.includes(`<@!${message.guild.me.id}>`)) return true; //was tagged
+        if (message.mentions.users.size > 0) { //is tagged
+            var mention = message.mentions.users.first()
+            if (mention.id == message.guild.me.id){
+                return true;
+            }
+        }
         if (!ALPHABET.includes(message.content[0].toUpperCase())) return false;
         if (message.content.includes('https://')) return false;
         if (message.content.includes('www.')) return false;
@@ -134,6 +139,22 @@ module.exports = {
         } 
         catch (error) {
             LOG.error(error, `Failed to write to file ${Path}`);
+        }
+    },
+
+    getValidBotTag(message,text)
+    {
+        if (text.includes(`<@!${message.guild.me.id}>`)) {
+            return (`<@!${message.guild.me.id}>`)
+        }
+        else if (text.includes(`<@${message.guild.me.id}>`)) {
+            return (`<@${message.guild.me.id}>`)
+        }
+        else if (text.includes(`<@&${message.guild.me.id}>`)) {
+            return (`<@&${message.guild.me.id}>`)
+        }
+        else{
+            return false;
         }
     }
 }

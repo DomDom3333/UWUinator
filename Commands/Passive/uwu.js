@@ -5,6 +5,7 @@ const COLLECTOR = require('../../BotFunctions/MessageCollector.js');
 const Utils = require('../../BotFunctions/Utils.js');
 const CommandConfigFileName = 'uwu.json'
 const COMMANDCONFIG = require(`./${CommandConfigFileName}`);
+var selfTag = 
 
 module.exports = {
     name: 'PassiveCommand',
@@ -33,8 +34,9 @@ function willTrigger(message,messageCheck,Index)
     var isBoundUser = COMMANDCONFIG.Servers[Index].BoundUsers.includes(message.author.id);
     if (isBoundUser) return true;
     if ((message.content.split(' ').length -1) < 2) return false;
-    if (!messageCheck.includes('r') || !messageCheck.includes('r')) return false;
-    var random_boolean = Math.random() <= COMMANDCONFIG.Servers[Index].TriggerChance;
+    if (!messageCheck.includes('r') && !messageCheck.includes('l')) return false;
+    var randNumber = Math.random()
+    var random_boolean = randNumber <= COMMANDCONFIG.Servers[Index].TriggerChance;
 
     var prefixAndChance = (message.content.includes(CONFIG.Prefix) && random_boolean == true);
     var lengthAndAmount = (messageCheck.length > CONFIG.lengthThreshhold || ((hasEnoughR(messageCheck) > CONFIG.rThreshhold || hasEnoughL(messageCheck) > CONFIG.lThreshhold)));
@@ -49,26 +51,27 @@ function willTrigger(message,messageCheck,Index)
     }
 }
 function altTriggers(message,checkThis,args){
-    if (checkThis === (`<@!${message.guild.me.id}>`)) //for some reason, copying a tag from discord back into discord results in a different ID. This code only works if the bot was manually tagged and the tag wasnt copied
+    var tagText = Utils.getValidBotTag(message,checkThis);
+    if (tagText != false && checkThis === tagText) //for some reason, copying a tag from discord back into discord results in a different ID. This code only works if the bot was manually tagged and the tag wasnt copied
     {
         wuvUser(message);
         return true;
     }
-    else if(checkThis === `<@!${message.guild.me.id}> sing`)
+    else if(tagText != false && checkThis === `${tagText} sing` || checkThis === `${tagText} sing`) 
     {
         var outputMsg = `Suwe thing!! \nhttps://www.youtube.com/watch?v=h6DNdop6pD8\nENJOY! UwU`
         logInput(message, outputMsg);
         COLLECTOR.Add(outputMsg);
         return true;
     }
-    else if(checkThis === `<@!${message.guild.me.id}> info` || checkThis === `<@!${message.guild.me.id}> help`)
+    else if(tagText != false && checkThis === `${tagText} info` || checkThis === `${tagText} help`)
     {
         var outputMsg = `YAY!! Pwease Vote fow me!! \nhttps://top.gg/bot/776864557775585296\nHere is my Discord server too: https://discord.gg/9g9xMkKY2N\nENJOY! UwU`
         logInput(message, outputMsg);
         COLLECTOR.Add(outputMsg);
         return true;
     }
-    else if (checkThis.startsWith(`<@!${message.guild.me.id}>`) && args.length > 1 && (args[1] == "chance" || args[1] == "bind" || args[1] == "unbind")){
+    else if (tagText != false && checkThis.startsWith(`${tagText}`) && args.length > 1 && (args[1] == "chance" || args[1] == "bind" || args[1] == "unbind")){
         switch (args[1]) {
             case 'chance':
                 if (args.length > 2 && message.member.hasPermission("ADMINISTRATOR")) {
@@ -110,7 +113,7 @@ function altTriggers(message,checkThis,args){
                 break;
         }
     }
-    else if(checkThis.includes(`<@!${message.guild.me.id}>`))
+    else if(checkThis.includes(`${tagText}`))
     {
         //wuvUser(message);
         Trigger(message);      
@@ -206,7 +209,7 @@ function AddBoundUser(userID,serverID){
 function RemoveBoundUser(userID,serverID){
     var index = GetServerIndex(serverID);
     var isBound = isUserBound(userID,index);
-    if (isBound == false) {
+    if (isBound === false) {
         COLLECTOR.Add("User is not bound.");
     }
     else{
@@ -230,15 +233,15 @@ function isUserBound(userID, serverIndex){
 function GetServerIndex(serverID){
     for (let i = 0; i < COMMANDCONFIG.Servers.length; i++) {
         const element = COMMANDCONFIG.Servers[i];
-        if (element.ServerID == serverID) {
+        if (element.ServerID === serverID) {
             return i;
-        } 
+        }
     }
     CreateServer(serverID);
     return COMMANDCONFIG.Servers.length-1;
 }
 function CreateServer(serverID){
-    COMMANDCONFIG.Servers[COMMANDCONFIG.Servers.length] = {ServerID:Number(serverID),TriggerChance:0.35,BoundUsers:[]}
+    COMMANDCONFIG.Servers[COMMANDCONFIG.Servers.length] = {ServerID:`${serverID}`,TriggerChance:0.35,BoundUsers:[]}
     SaveCommandConfig();
 }
 function SaveCommandConfig(){

@@ -43,7 +43,7 @@ for(const filename of PassiveCommandFiles){
 module.exports = {
     messageHandler(message) {//First split for messages
         var hasPrefix = false;
-        if (message.content[0] === CONFIG.Prefix) {
+        if (message.content.startsWith(CONFIG.Prefix)) {
             hasPrefix = true;
         }
         var args = messagePrep(message,hasPrefix);
