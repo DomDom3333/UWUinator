@@ -46,7 +46,7 @@ module.exports = {
 async function messageAdder(textToAdd){
     var actualText = await textToAdd; // could be promise so just to make sure....
     if(actualText){ //check for content (due to JS, if there is ANYTHING in the string, it will return true since the binary value is more than 1.)
-        return messageSoFar = `${messageSoFar} ${actualText}\n`;
+        return messageSoFar = `${messageSoFar}${actualText}\n`;
     }
     else{
         console.log('Empty message was submitted to the Message collector.');

@@ -59,8 +59,7 @@ module.exports = {
         if (!isAllowedToSend(message)) return false; //doesnt respond if not allowed to send to channel. Otherwise discord.js errors
         if (message.channel.nsfw) return false;
         if (message.mentions.users.size > 0) { //is tagged
-            var mention = message.mentions.users.first()
-            if (mention.id == message.guild.me.id){
+            if (userArrayIncludes(message.mentions.users, message.guild.me)) {
                 return true;
             }
         }
@@ -156,10 +155,35 @@ module.exports = {
         else{
             return false;
         }
+    },
+    CleanArray(args){
+        return CleanArrayOfEmpty(args)
     }
+}
+
+function userArrayIncludes(array, user){
+    var isIncluded = false;
+    array.forEach(element => {
+        if (element.id == user.id) {
+            isIncluded = true;          
+        }
+    });
+    return isIncluded;
 }
 
 function isAllowedToSend(message){
     var memberPerms = message.channel.permissionsFor(message.guild.me);
     return memberPerms.has('SEND_MESSAGES')
+}
+
+function CleanArrayOfEmpty(args){
+    for (let index = 0; index < args.length; index++) {
+        const element = args[index];
+        if (!element || element.length === 0 || !element.trim()) 
+        {
+            args.splice(index, 1);
+            index--;
+        }        
+    }
+    return args;
 }

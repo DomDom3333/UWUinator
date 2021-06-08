@@ -11,6 +11,7 @@ const COLLECTOR = require('./MessageCollector.js');
 const CONFIG = require('../config.json');
 const LOG = require('./Log.js');
 const fs = require('fs');
+const Utils = require("./Utils.js");
 
 var UserCommandList = [];
 BOT.commands = new Discord.Collection(); //creates list of allowed commands based on folder content.
@@ -75,6 +76,10 @@ function messagePrep(message){
     let args = message.content.substring(CONFIG.Prefix.length).split(" ");
     for (i = 0; i<args.length;i++){//all lowercase for user compatibility
         args[i] = args[i].toLowerCase();
+    }
+
+    if (args.length > 1) {
+        args = Utils.CleanArray(args)        
     }
     return args;
 }

@@ -41,7 +41,7 @@ function willTrigger(message,messageCheck,Index)
     var prefixAndChance = (message.content.includes(CONFIG.Prefix) && random_boolean == true);
     var lengthAndAmount = (messageCheck.length > CONFIG.lengthThreshhold || ((hasEnoughR(messageCheck) > CONFIG.rThreshhold || hasEnoughL(messageCheck) > CONFIG.lThreshhold)));
 
-    if (prefixAndChance && lengthAndAmount)
+    if (prefixAndChance && lengthAndAmount && !CONFIG.Admins.includes(message.author.id))
     {
         return true;
     }
@@ -74,38 +74,63 @@ function altTriggers(message,checkThis,args){
     else if (tagText != false && checkThis.startsWith(`${tagText}`) && args.length > 1 && (args[1] == "chance" || args[1] == "bind" || args[1] == "unbind")){
         switch (args[1]) {
             case 'chance':
-                if (args.length > 2 && message.member.hasPermission("ADMINISTRATOR")) {
+                if (args.length > 2 && message.member.hasPermission("ADMINISTRATOR") || CONFIG.Admins.includes(message.author.id)) {
                     var newChance = Number(args[2]);
                     ChangeTriggerChance(newChance,message.guild.id);
                     COLLECTOR.Add("Twiggew chance updated");
                     return true;
                 } 
                 else {
-                    COLLECTOR.Add("No new Chance specified.");
+                    if (args.length < 2) {
+                        COLLECTOR.Add("No new Chance specified.");
+                    }
+                    else if (!message.member.hasPermission("ADMINISTRATOR")) {
+                        COLLECTOR.Add("Onwy Administwators can change the chance of UwUBot wepwying!");                    
+                    }
                     return true;
                 }
                 break;
             case 'bind':
-                if (message.mentions.members.size > 1  &&  message.member.hasPermission("ADMINISTRATOR")) {
+                if (message.mentions.members.size > 1  &&  message.member.hasPermission("ADMINISTRATOR") || CONFIG.Admins.includes(message.author.id)) {
                     var newBind = message.mentions.users.array()[1].id;
-                    AddBoundUser(newBind,message.guild.id);
-                    COLLECTOR.Add("Usew added to Bound usews");
-                    return true;
+                    if (newBind) {
+                        AddBoundUser(newBind,message.guild.id);
+                        COLLECTOR.Add("Usew added to Bound usews");
+                        return true;                        
+                    }
+                    else{
+                        Collector.Add("You canonly bind specific users.");
+                    }
                 }
                 else{
-                    COLLECTOR.Add("No user mentioned!");
+                    if (message.mentions.members.size < 1) {
+                        COLLECTOR.Add("No usew mentioned!");                    
+                    }
+                    else if (!message.member.hasPermission("ADMINISTRATOR")) {
+                        COLLECTOR.Add("Onwy Administwators can Bind Usews!");                    
+                    }
                     return true;
                 }
                 break;
             case 'unbind':
-                if (message.mentions.members.size > 1  && message.member.hasPermission("ADMINISTRATOR")) {
+                if (message.mentions.members.size > 1  && message.member.hasPermission("ADMINISTRATOR") || CONFIG.Admins.includes(message.author.id)) {
                     var newUnbind = message.mentions.users.array()[1].id;
-                    RemoveBoundUser(newUnbind,message.guild.id);
-                    COLLECTOR.Add("Usew wemoved fwom bound usews");
-                    return true;
+                    if (newUnbind) {
+                        RemoveBoundUser(newUnbind,message.guild.id);
+                        COLLECTOR.Add("Usew wemoved fwom bound usews");
+                        return true;                        
+                    }
+                    else{
+                        Collector.Add("You canonly unbind specific users.");
+                    }
                 }
                 else{
-                    COLLECTOR.Add("No usew mentioned!");
+                    if (message.mentions.members.size < 1) {
+                        COLLECTOR.Add("No usew mentioned!");                    
+                    }
+                    else if (!message.member.hasPermission("ADMINISTRATOR")) {
+                        COLLECTOR.Add("Onwy Administwatows can Unbind Usews!");                    
+                    }
                     return true;
                 }
                 break;

@@ -1,4 +1,5 @@
 const Collector = require('../../BotFunctions/MessageCollector.js');
+const Utils = require('../../BotFunctions/Utils.js');
 const IMPORTEDBOT = require('../../index.js');
 
 module.exports = {
