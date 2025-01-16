@@ -19,7 +19,7 @@ namespace UwUinator
             _client = client;
             _logger = logger;
             _messageHandler = messageHandler;
-            _config = config;
+            _config = config; 
 
             _client.Log += LogAsync;
             _client.Ready += OnReadyAsync;
