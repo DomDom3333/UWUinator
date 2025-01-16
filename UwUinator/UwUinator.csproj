@@ -6,16 +6,10 @@
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <PublishAot>true</PublishAot>
+        <PublishAot>false</PublishAot>
         <InvariantGlobalization>false</InvariantGlobalization>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
-
-    <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Discord.Net" Version="3.17.0" />
@@ -24,6 +18,12 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
       <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.1" />
       <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>
