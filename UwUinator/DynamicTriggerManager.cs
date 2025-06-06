@@ -51,16 +51,15 @@ namespace UwUinator
         {
             if (!ShouldConsiderMessage(message))
                 return;
-            {
-                var timestamp = DateTime.UtcNow;
-                _logger.LogDebug("[RecordMessage] Message recorded at {Timestamp}. Content: \"{Content}\"",
-                    timestamp, message.Content);
-                _messageTimestamps.Enqueue(timestamp);
-                AdjustScalingFactors();
-                RemoveOldTimestamps(_messageTimestamps);
-                _logger.LogDebug("[RecordMessage] Total messages after cleanup: {MessageCount}",
-                    _messageTimestamps.Count);
-            }
+
+            var timestamp = DateTime.UtcNow;
+            _logger.LogDebug("[RecordMessage] Message recorded at {Timestamp}. Content: \"{Content}\"",
+                timestamp, message.Content);
+            _messageTimestamps.Enqueue(timestamp);
+            AdjustScalingFactors();
+            RemoveOldTimestamps(_messageTimestamps);
+            _logger.LogDebug("[RecordMessage] Total messages after cleanup: {MessageCount}",
+                _messageTimestamps.Count);
         }
 
         /// <summary>
