@@ -16,7 +16,7 @@ namespace UwUinator
         private readonly HashSet<string> _recentFeatures = new();
 
         private readonly DynamicTriggerManager _triggerManager;
-        
+
         public UwUifyMessageHandler(ILogger<UwUifyMessageHandler> logger)
         {
             _logger = logger;
@@ -107,7 +107,7 @@ namespace UwUinator
             uwuified = AddSeasonalFlair(uwuified);
             uwuified = AddMoodEnhancements(uwuified);
             uwuified = AddRelevantEmojis(uwuified);
-            
+
             uwuified = Regex.Replace(uwuified, "[rl]", "w");
             uwuified = Regex.Replace(uwuified, "[RL]", "W");
 
@@ -281,7 +281,7 @@ namespace UwUinator
             }
 
             // Add responses based on message length
-            if (input.Length > 500 &&  _random.NextDouble() < 0.1)
+            if (input.Length > 500 && _random.NextDouble() < 0.1)
             {
                 input += Environment.NewLine +
                          "UwU dat’s a wot of wowds nya~!! 😺 *twies 2 wead awe of it weawwy fast!*";
@@ -425,7 +425,7 @@ namespace UwUinator
             {
                 input += Environment.NewLine + musicResponses[_random.Next(musicResponses.Length)];
             }
-            
+
             if (DateTime.Now.Hour % 12 == 0 && DateTime.Now.Minute == 0) // Example: Time-Based Enhancement
             {
                 input += Environment.NewLine + "Hewwooo! UwU dis is a time-special magical weply OwO ♥!";
