@@ -103,10 +103,12 @@ namespace UwUinator
         public void RecordTrigger()
         {
             lock (_lock)
+            {
                 if (_triggerTimestamps.Count > _maxTriggersPerWindow)
                     return;
-            {
+
                 var timestamp = DateTime.UtcNow;
+                _triggerTimestamps.Enqueue(timestamp);
                 _logger.LogDebug("[RecordTrigger] Trigger recorded at {Timestamp}. Total triggers: {TriggerCount}",
                     timestamp, _triggerTimestamps.Count);
                 RemoveOldTimestamps(_triggerTimestamps);
