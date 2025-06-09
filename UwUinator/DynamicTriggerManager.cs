@@ -12,18 +12,42 @@ namespace UwUinator
     {
         private readonly ILogger<UwUifyMessageHandler> _logger; // Logger instance
         private readonly int _defaultTimeWindowInSeconds; // Default time window
-        private readonly ConcurrentQueue<DateTime> _triggerTimestamps; // Queue for tracking triggers
-        private readonly ConcurrentQueue<DateTime> _messageTimestamps; // Queue for tracking all messages
+        private readonly int _baseMaxTriggersPerWindow; // Base max triggers
         private readonly object _lock = new(); // Lock for thread safety
+
+        private class GuildActivity
+        {
+            public ConcurrentQueue<DateTime> MessageTimestamps { get; } = new();
+            public ConcurrentQueue<DateTime> TriggerTimestamps { get; } = new();
+            public int TimeWindowInSeconds;
+            public int MaxTriggersPerWindow;
+            public DateTime LastTrigger = DateTime.MinValue;
+            public int BackoffLevel;
+        }
+
+        private readonly Dictionary<ulong, GuildActivity> _guildActivities = new();
 
         private readonly Dictionary<ulong, (DateTime LastTimestamp, ulong LastMessageId)>
             _lastMessageTimestamps = new();
 
         private readonly Random _random = new();
 
-        // Dynamic thresholds
-        private int _maxTriggersPerWindow; // Dynamically adjusted max triggers
-        private int _timeWindowInSeconds; // Timeframe for scaling
+        private GuildActivity GetGuildActivity(ulong guildId)
+        {
+            if (!_guildActivities.TryGetValue(guildId, out var activity))
+            {
+                activity = new GuildActivity
+                {
+                    TimeWindowInSeconds = _defaultTimeWindowInSeconds,
+                    MaxTriggersPerWindow = _baseMaxTriggersPerWindow
+                };
+                _guildActivities[guildId] = activity;
+            }
+
+            return activity;
+        }
+
+        // All dynamic thresholds are now tracked per guild
 
         /// <summary>
         /// Initializes the DynamicTriggerManager with default settings.
@@ -33,15 +57,11 @@ namespace UwUinator
         {
             _logger = logger; // Assign logger instance
             _defaultTimeWindowInSeconds = defaultTimeWindowInSeconds;
+            _baseMaxTriggersPerWindow = baseMaxTriggersPerWindow;
 
             _logger.LogInformation(
                 "[Initialization] Default time window: {TimeWindow}s, Base max triggers per window: {MaxTriggers}",
-                _defaultTimeWindowInSeconds, baseMaxTriggersPerWindow);
-            _timeWindowInSeconds = defaultTimeWindowInSeconds;
-            _maxTriggersPerWindow = baseMaxTriggersPerWindow;
-
-            _triggerTimestamps = new ConcurrentQueue<DateTime>();
-            _messageTimestamps = new ConcurrentQueue<DateTime>();
+                _defaultTimeWindowInSeconds, _baseMaxTriggersPerWindow);
         }
 
         /// <summary>
@@ -55,11 +75,20 @@ namespace UwUinator
             var timestamp = DateTime.UtcNow;
             _logger.LogDebug("[RecordMessage] Message recorded at {Timestamp}. Content: \"{Content}\"",
                 timestamp, message.Content);
-            _messageTimestamps.Enqueue(timestamp);
-            AdjustScalingFactors();
-            RemoveOldTimestamps(_messageTimestamps);
-            _logger.LogDebug("[RecordMessage] Total messages after cleanup: {MessageCount}",
-                _messageTimestamps.Count);
+
+            var guildId = (message.Channel as SocketTextChannel)?.Guild.Id;
+            if (guildId == null)
+                return;
+
+            lock (_lock)
+            {
+                var activity = GetGuildActivity(guildId.Value);
+                activity.MessageTimestamps.Enqueue(timestamp);
+                AdjustScalingFactors(activity);
+                RemoveOldTimestamps(activity.MessageTimestamps, activity.TimeWindowInSeconds);
+                _logger.LogDebug("[RecordMessage] Guild {Guild} message count: {MessageCount}",
+                    guildId, activity.MessageTimestamps.Count);
+            }
         }
 
         /// <summary>
@@ -68,28 +97,36 @@ namespace UwUinator
         /// <returns>True if the bot should trigger; otherwise, false.</returns>
         public bool ShouldTrigger(SocketMessage message)
         {
+            var guildId = (message.Channel as SocketTextChannel)?.Guild.Id;
+            if (guildId == null)
+                return false;
+
             lock (_lock)
             {
-                RemoveOldTimestamps(_triggerTimestamps);
+                var activity = GetGuildActivity(guildId.Value);
 
-                // Enforce cooldown for low activity (e.g., one trigger per minute)
-                if (_triggerTimestamps.TryPeek(out var lastTrigger) &&
-                    (DateTime.UtcNow - lastTrigger).TotalSeconds < 60)
+                RemoveOldTimestamps(activity.TriggerTimestamps, activity.TimeWindowInSeconds);
+
+                var now = DateTime.UtcNow;
+                double cooldown = 30 * Math.Pow(2, activity.BackoffLevel);
+                if ((now - activity.LastTrigger).TotalSeconds < cooldown)
                 {
-                    _logger.LogWarning(
-                        "[ShouldTrigger] Rejected due to cooldown. Last trigger was {TimeSinceLastTrigger}s ago.",
-                        (DateTime.UtcNow - lastTrigger).TotalSeconds);
+                    _logger.LogWarning("[ShouldTrigger] Guild {Guild} in backoff. Cooldown {Cooldown}s remaining", guildId,
+                        cooldown - (now - activity.LastTrigger).TotalSeconds);
                     return false;
                 }
 
-                var triggerProbability = CalculateTriggerProbability(message.Content);
+                // Decay backoff over time
+                if (activity.BackoffLevel > 0 && (now - activity.LastTrigger).TotalSeconds >= cooldown)
+                    activity.BackoffLevel--;
+
+                var triggerProbability = CalculateTriggerProbability(message.Content, activity);
                 _logger.LogDebug("[ShouldTrigger] Calculated trigger probability: {TriggerProbability}",
                     triggerProbability);
 
                 if (!ShouldConsiderMessage(message) || ContainsLink(message.Content) || HasAttachments(message))
                     return false;
 
-                // Roll the chance based on the calculated probability
                 var result = _random.NextDouble() < triggerProbability;
                 _logger.LogDebug("[ShouldTrigger] Should trigger: {Result}", result);
                 return result;
@@ -99,29 +136,40 @@ namespace UwUinator
         /// <summary>
         /// Records a trigger event.
         /// </summary>
-        public void RecordTrigger()
+        public void RecordTrigger(SocketMessage message)
         {
+            var guildId = (message.Channel as SocketTextChannel)?.Guild.Id;
+            if (guildId == null)
+                return;
+
             lock (_lock)
             {
-                if (_triggerTimestamps.Count > _maxTriggersPerWindow)
+                var activity = GetGuildActivity(guildId.Value);
+
+                if (activity.TriggerTimestamps.Count > activity.MaxTriggersPerWindow)
                     return;
 
                 var timestamp = DateTime.UtcNow;
-                _triggerTimestamps.Enqueue(timestamp);
-                _logger.LogDebug("[RecordTrigger] Trigger recorded at {Timestamp}. Total triggers: {TriggerCount}",
-                    timestamp, _triggerTimestamps.Count);
-                RemoveOldTimestamps(_triggerTimestamps);
+                activity.TriggerTimestamps.Enqueue(timestamp);
+                activity.LastTrigger = timestamp;
+                activity.BackoffLevel = Math.Min(activity.BackoffLevel + 1, 5);
+
+                _logger.LogDebug(
+                    "[RecordTrigger] Guild {Guild} trigger recorded at {Timestamp}. Total: {TriggerCount}",
+                    guildId, timestamp, activity.TriggerTimestamps.Count);
+
+                RemoveOldTimestamps(activity.TriggerTimestamps, activity.TimeWindowInSeconds);
             }
         }
 
         /// <summary>
         /// Removes outdated timestamps outside the time window.
         /// </summary>
-        private void RemoveOldTimestamps(ConcurrentQueue<DateTime> timestamps)
+        private void RemoveOldTimestamps(ConcurrentQueue<DateTime> timestamps, int windowInSeconds)
         {
             int removedCount = 0;
             while (timestamps.TryPeek(out var oldest) &&
-                   (DateTime.UtcNow - oldest).TotalSeconds > _timeWindowInSeconds)
+                   (DateTime.UtcNow - oldest).TotalSeconds > windowInSeconds)
             {
                 timestamps.TryDequeue(out _);
                 removedCount++;
@@ -135,36 +183,36 @@ namespace UwUinator
         /// <summary>
         /// Adjusts scaling factors dynamically based on recent activity.
         /// </summary>
-        private void AdjustScalingFactors()
+        private void AdjustScalingFactors(GuildActivity activity)
         {
-            var totalMessageCount = _messageTimestamps.Count;
+            var totalMessageCount = activity.MessageTimestamps.Count;
 
-            // For very low activity, use minimum thresholds
             if (totalMessageCount < 5)
             {
-                _timeWindowInSeconds = _defaultTimeWindowInSeconds; // Keep the default window
-                _maxTriggersPerWindow = 1; // Allow only 1 trigger
+                activity.TimeWindowInSeconds = _defaultTimeWindowInSeconds;
+                activity.MaxTriggersPerWindow = 1;
             }
             else
             {
-                _timeWindowInSeconds = _defaultTimeWindowInSeconds + totalMessageCount / 100;
-                _maxTriggersPerWindow = Math.Max(10, totalMessageCount / 10); // Scale based on activity
+                activity.TimeWindowInSeconds = _defaultTimeWindowInSeconds + totalMessageCount / 100;
+                activity.MaxTriggersPerWindow = Math.Max(_baseMaxTriggersPerWindow,
+                    totalMessageCount / 10);
             }
 
             _logger.LogInformation(
-                "[AdjustScalingFactors] Adjusted time window: {TimeWindow}s, Max triggers per window: {MaxTriggers}",
-                _timeWindowInSeconds, _maxTriggersPerWindow);
+                "[AdjustScalingFactors] Guild scaling updated. Time window: {TimeWindow}s, Max triggers: {MaxTriggers}",
+                activity.TimeWindowInSeconds, activity.MaxTriggersPerWindow);
         }
 
         /// <summary>
         /// Calculates trigger probability based on activity and load.
         /// </summary>
         /// <returns>A double representing trigger likelihood.</returns>
-        private double CalculateTriggerProbability(string messageContent)
+        private double CalculateTriggerProbability(string messageContent, GuildActivity activity)
         {
-            var triggerCount = _triggerTimestamps.Count;
-            var totalMessages = _messageTimestamps.Count;
-            _logger.LogInformation("[CalculateTriggerProbability] Total Messages: {TotalMessages}", totalMessages);
+            var triggerCount = activity.TriggerTimestamps.Count;
+            var totalMessages = activity.MessageTimestamps.Count;
+            _logger.LogInformation("[CalculateTriggerProbability] Guild messages: {TotalMessages}", totalMessages);
 
             if (totalMessages == 0)
                 return 0.0; // Don't trigger if no messages in the window
@@ -173,14 +221,14 @@ namespace UwUinator
             int lrCount = Regex.Matches(messageContent ?? string.Empty, "[lr]", RegexOptions.IgnoreCase).Count;
 
             // Base probability
-            double baseProbability = Math.Max(0.2, 0.5 - (double)triggerCount / _maxTriggersPerWindow);
+            double baseProbability = Math.Max(0.2, 0.5 - (double)triggerCount / activity.MaxTriggersPerWindow);
 
             // Increase probability based on 'l'/'r' count
             double lrFactor = Math.Min(0.2, lrCount * 0.01); // Cap additional probability at 0.2
             baseProbability += lrFactor;
 
             // Scale down probability if trigger limit is reached
-            if (triggerCount >= _maxTriggersPerWindow)
+            if (triggerCount >= activity.MaxTriggersPerWindow)
             {
                 return Math.Max(0.1, baseProbability * 0.5);
             }
