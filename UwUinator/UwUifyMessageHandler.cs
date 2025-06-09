@@ -51,7 +51,7 @@ namespace UwUinator
                 return;
             }
 
-            _triggerManager.RecordTrigger();
+            _triggerManager.RecordTrigger(message);
 
             // Pre-Typing Messages (introduce anticipation)
             _logger.LogInformation(
