@@ -24,6 +24,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set lowercase repository value
+        run: echo "REPO_LC=$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
       - name: Build and push image
         uses: docker/build-push-action@v6
         with:
@@ -31,5 +33,5 @@ jobs:
           file: UwUinator/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/uwuinator:latest
-            ghcr.io/${{ github.repository }}/uwuinator:${{ github.ref_name }}
+            ghcr.io/${{ env.REPO_LC }}/uwuinator:latest
+            ghcr.io/${{ env.REPO_LC }}/uwuinator:${{ github.ref_name }}
